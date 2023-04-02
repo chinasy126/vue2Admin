@@ -24,6 +24,7 @@
     "path-to-regexp": "2.4.0",
     "quill-image-drop-module": "^1.0.3",
     "quill-image-resize-module": "^3.0.0",
+    "sortablejs": "^1.15.0",
     "vue": "2.6.10",
     "vue-awesome": "^4.5.0",
     "vue-quill-editor": "^3.0.6",

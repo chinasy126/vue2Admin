@@ -25,7 +25,6 @@ export function menuList(params, currentPage, pageSize) {
   })
 }
 
-
 export function dataInsert(params) {
   return request({
     url: `/${urlPrefix}/insert`,
@@ -99,7 +98,7 @@ export function allMultilevelClassification() {
 export function batchInsert(params) {
   return request({
     // url: `/menuButton/menubutton/list`,
-     url: `/${urlPrefix}/batch`,
+    url: `/${urlPrefix}/batch`,
     method: 'post',
     data: params
   })
@@ -110,10 +109,44 @@ export function batchInsert(params) {
  * @param params
  * @returns {AxiosPromise}
  */
-export function saveOrUpdate(params){
+export function saveOrUpdate(params) {
   return request({
     url: `/${urlPrefix}/saveOrUpdate`,
     method: 'post',
     data: params
+  })
+}
+
+export function deleteBtn(params) {
+  return request({
+    url: `/menubutton/delete`,
+    method: 'post',
+    data: params
+  })
+}
+
+/**
+ * 获取二级菜单
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function getSecMenuList(data) {
+  return request({
+    url: `/menu/getSecMenuList`,
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 插入按钮数据
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function indertBtn(data) {
+  return request({
+    url: `/menubutton/indertBtn`,
+    method: 'post',
+    data
   })
 }

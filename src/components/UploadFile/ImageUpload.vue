@@ -218,7 +218,6 @@ export default {
           }
           this.$emit('uploadSuccess', _this.uploadImgUrl, 'upload')
         } else {
-          debugger
           this.$message.error('上传文件错误')
           // this.$Message('error', res.message)
         }

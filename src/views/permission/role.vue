@@ -7,7 +7,7 @@
       @onSearch="handleEventSearch"
     >
       <template slot="operationButton">
-        <el-button @click="opearDialog('add','')"> 新增</el-button>
+        <el-button @click="opearDialog('add','')" v-permission="['add']" > 新增</el-button>
       </template>
     </SearchPanel>
     <!-- E 搜索栏目 -->
@@ -35,11 +35,21 @@
       </template>
 
       <template slot="operation" slot-scope="{scope}">
-        <el-button @click="opearDialog('edit',scope)"> 编辑</el-button>
-        <el-button @click="deleteData(scope)" type="danger"> 删除</el-button>
+        <el-button @click="opearDialog('edit',scope)" v-permission="['edit']" > 编辑</el-button>
+        <el-button @click="deleteData(scope)" type="danger" v-permission="['delete']" > 删除</el-button>
       </template>
     </el-table-custom>
     <!-- E 表格 -->
+
+    <!--  S 分页  -->
+    <Page
+      @changeSize="changeSize"
+      @changeNum="changeNum"
+      :total="totalCount"
+      :pageNum="pageNum"
+      :pageSize="pageSize"
+    ></Page>
+    <!--  E 分页  -->
 
     <!-- S 弹框删除操作 -->
     <common-action
@@ -89,7 +99,7 @@
 </template>
 
 <script>
-
+import Page from '@/components/Page/index'
 import { allMultilevelClassification } from '@/api/permission/menu'
 import { dataDelete, dataListByPage, insertRole, modifyRole } from '@/api/permission/role'
 import SearchPanel from '@/components/SearchPanel/SearchPanel'
@@ -103,12 +113,14 @@ import comActionMixin from '@/mixins/comActionMixin'
 
 export default {
   name: 'role',
-  components: { RolePermission, FormData, CommonAction, SearchPanel },
+  components: { Page,RolePermission, FormData, CommonAction, SearchPanel },
   mixins: [queryListmixin, opFormMixins, comActionMixin],
   filters: {},
   data() {
 
     return {
+      // 展开
+      defaultExpandedKeys: [],
       selectMenus: [],
       allMenus: [],
       defaultCheckedKeys: [],
@@ -169,7 +181,7 @@ export default {
             return { menuId: data[0], menuTitle: data[1], rolebuttonsList: this.insertBunList(item, selectAllIds) }
           })
           this.$set(this.form, 'roleMenus', selectMenus)
-          console.log(this.form)
+
           if (typeof (this.form) !== 'undefined' && this.form.id) {
             await modifyRole(this.form)
           } else {
@@ -210,20 +222,39 @@ export default {
     async opearDialog(opera, param) {
       this.defaultCheckedKeys = []
       await this.getAllMenus()
-      let arrayDefaultCheck = []
-      if (opera === 'add') {
+      let arrayDefaultCheck = [] // 选中
+      this.defaultExpandedKeys = [] // 展开
 
+      if (opera === 'add') {
+        const formItem = JSON.parse(JSON.stringify(this.form))
+        Reflect.ownKeys(formItem).forEach(item => formItem[item] = '')
+        this.form = formItem
       } else if (opera === 'edit') {
         this.form = param
         param.roleMenus.forEach(item => {
-          if (item.menuFid !== 0) {
-            arrayDefaultCheck.push(item.menuId + ',' + item.menuTitle)
-          }
+          arrayDefaultCheck = [...arrayDefaultCheck, ...this.getBtnListFromMenu(item)]
+          // if (item.menuFid !== 0) {
+          //   arrayDefaultCheck.push(item.menuId + ',' + item.menuTitle)
+          // }
         })
       }
       this.defaultCheckedKeys = arrayDefaultCheck
+      this.defaultExpandedKeys = arrayDefaultCheck
       this.formDialogVisible = true
     },
+
+    getBtnListFromMenu(data) {
+      const btnList = []
+      if (data.rolebuttonsList && data.rolebuttonsList.length !== 0) {
+        data.rolebuttonsList.forEach(item => {
+          // 229,新闻组件,add,添加
+          btnList.push(`${data.menuId},${data.menuTitle},${item.buttonType},${item.buttonName}`)
+        })
+        return btnList
+      }
+      return btnList
+    },
+
     /**
      * 获取所有菜单
      * @returns {Promise<void>}
@@ -284,7 +315,7 @@ export default {
       this.comActionCondition = { id: param.id }
       this.comActionDialog.visible = true
     }
-  },
+  }
 }
 </script>
 

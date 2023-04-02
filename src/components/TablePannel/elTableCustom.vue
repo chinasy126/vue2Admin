@@ -45,22 +45,6 @@
 
     </el-table>
     <!-- E 封装TABLE -->
-
-    <!-- S 封装分页 -->
-    <el-card class="pagination">
-      <el-pagination
-        v-if="total > 0"
-        background
-        :current-page="pageNum"
-        :page-sizes="pageSizes"
-        :page-size="pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
-    </el-card>
-    <!-- E 封装分页 -->
   </div>
 </template>
 
@@ -74,34 +58,6 @@ export default {
       type: Boolean,
       default: () => {
         return false
-      }
-    },
-    // 修改页数
-    pageSizes: {
-      type: Array,
-      default: () => {
-        return [5, 10, 15, 20]
-      }
-    },
-    // 总页数
-    total: {
-      type: Number,
-      default: () => {
-        return 0
-      }
-    },
-    // 当前页
-    pageNum: {
-      type: Number,
-      default: () => {
-        return 0
-      }
-    },
-    // 一共多少页
-    pageSize: {
-      type: Number,
-      default: () => {
-        return 0
       }
     },
     // 是否显示序列号
@@ -174,16 +130,6 @@ export default {
     handleRow(index, row, lable) {
       console.log(index, row, lable)
     },
-
-    handleSizeChange(val) {
-      this.$emit('changeSize', val)
-      console.log(`每页 ${val} 条`)
-    },
-
-    handleCurrentChange(val) {
-      this.$emit('changeNum', val)
-      console.log(`当前页: ${val}`)
-    }
 
   },
   computed: {}

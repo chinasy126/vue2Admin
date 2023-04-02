@@ -9,8 +9,8 @@
           :inline="true"
         >
           <slot></slot>
-          <template v-for="(item,index) in itemList">
-            <el-col :span="spanNum">
+          <template v-for="(item,index) in searchItemList">
+            <el-col :span="spanNum" :key="index">
               <slot :name="index"></slot>
               <el-form-item :label="item.name" :key="index" :prop="item.prop" class="searchLabel">
                 <!-- 输入框 -->
@@ -123,12 +123,22 @@ export default {
       })
       this.$emit('onSearch', params)
     }
+  },
+  computed: {
+    searchItemList() {
+      return this.itemList
+    }
   }
 }
 </script>
 
 
 <style lang="less" scoped>
+
+///deep/ .el-form-item__label {
+//  color: #606266;
+//}
+
 .searchPannel {
   margin-bottom: 25px;
 }

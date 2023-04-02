@@ -5,9 +5,9 @@
     <breadcrumb class="breadcrumb-container"/>
 
     <div class="right-menu">
-      <el-dropdown class="avatar-container" trigger="click">
+      <el-dropdown class="avatar-container">
         <div class="avatar-wrapper">
-          <img :src="prefix+avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <img :src="prefix+avatar+'?imageView2/1/w/80/h/80'" class="user-avatar" @click="showUserInfo">
           <i class="el-icon-caret-bottom"/>
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -22,6 +22,17 @@
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
+
+      <el-drawer
+        :visible.sync="drawer"
+        :with-header="false"
+      >
+        <el-row :gutter="20">
+          <el-col :span="8">用户名</el-col>
+          <el-col :span="12">{{ userInfo.name }}</el-col>
+        </el-row>
+      </el-drawer>
+
     </div>
   </div>
 </template>
@@ -30,6 +41,7 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import store from './index'
 
 export default {
   components: {
@@ -45,7 +57,21 @@ export default {
       return process.env.VUE_APP_UPLOAD_API
     }
   },
+  data() {
+    return {
+      drawer: false,
+      userInfo: {
+        name: ''
+      }
+    }
+  },
   methods: {
+    showUserInfo() {
+      console.log(this.$store)
+      this.userInfo = this.$store.getters
+      this.drawer = true
+
+    },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },

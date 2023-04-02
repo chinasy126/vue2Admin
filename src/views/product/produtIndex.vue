@@ -38,6 +38,16 @@
     </el-table-custom>
     <!-- E 表格 -->
 
+    <!--  S 分页  -->
+    <Page
+      @changeSize="changeSize"
+      @changeNum="changeNum"
+      :total="totalCount"
+      :pageNum="pageNum"
+      :pageSize="pageSize"
+    ></Page>
+    <!--  E 分页  -->
+
     <!-- S 弹框删除操作 -->
     <common-action
       :comActionDialog="comActionDialog"
@@ -90,10 +100,10 @@ import opFormMixin from '@/mixins/opFormMixin'
 import { parseTime, transformClassPower } from '@/utils'
 
 import QuillEditor from '@/components/QuillEditor/index'
-
+import Page from '@/components/Page/index'
 export default {
   name: 'produtIndex',
-  components: { OpFormPannel, ImageUpload, CommonAction, SearchPanel,QuillEditor},
+  components: {Page, OpFormPannel, ImageUpload, CommonAction, SearchPanel,QuillEditor},
   mixins: [queryListmixin, comActionMixin, opFormMixin],
   filters: { },
   data() {

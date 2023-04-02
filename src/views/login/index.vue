@@ -150,7 +150,9 @@ export default {
           this.$store.dispatch('user/login', this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || '/' })
             this.loading = false
-          }).catch(() => {
+          }).catch((e) => {
+            console.error(e)
+          }).finally(() => {
             this.loading = false
           })
         } else {
@@ -163,7 +165,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
@@ -177,13 +179,13 @@ $cursor: #fff;
   }
 }
 
-.el-form-item__label {
+v-deep .el-form-item__label {
   color: white;
 }
 
 /* reset element-ui css */
 .login-container {
-  .el-input {
+  ::v-deep .el-input {
     display: inline-block;
     height: 47px;
     width: 85%;

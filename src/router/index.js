@@ -43,8 +43,10 @@ export const constantRoutes = [
     path: '/404',
     component: () => import('@/views/404'),
     hidden: true
-  },
+  }
+]
 
+export const adminRoutes = [
   {
     path: '/',
     component: Layout,
@@ -55,40 +57,68 @@ export const constantRoutes = [
       component: () => import('@/views/dashboard/index'),
       meta: { title: '首页', icon: 'dashboard' }
     }]
-  },
-  {
-    path: '/permission',
-    component: Layout,
-    name: 'permission',
-    alwaysShow: true, // 当有一个子菜单显示
-    meta: { title: '系统管理', icon: 'el-icon-s-help' },
-    children: [
-      {
-        path: 'menu',
-        name: 'menu',
-        component: () => import('@/views/permission/menu'),
-        meta: { title: '菜单管理', icon: 'form' }
-      },
-      {
-        path: 'role',
-        name: 'role',
-        component: () => import('@/views/permission/role'),
-        meta: { title: '角色管理', icon: 'form' }
-      },
-      {
-        path: 'user',
-        name: 'user',
-        component: () => import('@/views/permission/user'),
-        meta: { title: '用户管理', icon: 'form' }
-      }
-    ]
   }
 ]
 
 /**
  * 动态路由
  */
-export const asyncRoutes = [
+
+export const configRoutes = [
+  {
+    path: '/permission',
+    component: Layout,
+    name: 'permissions',
+    alwaysShow: true, // 当有一个子菜单显示
+    meta: { title: '系统管理', icon: 'el-icon-s-help', 'menuOrder': 0 },
+    children: [
+      {
+        path: 'menu',
+        name: 'menu',
+        component: () => import('@/views/permission/menu'),
+        meta: {
+          title: '菜单管理', icon: 'form', 'menuOrder': 0,
+          btnPermissions: [
+            { title: '编辑', type: 'edit' },
+            { title: '删除', type: 'delete' },
+            { title: '新增菜单', type: 'addMenu' },
+            { title: '新增按钮', type: 'addButton' },
+            { title: '批量删除', type: 'batchDelete' },
+            { title: '批量同步', type: 'batchSync' }
+
+          ]
+        }
+      },
+      {
+        path: 'role',
+        name: 'role',
+        component: () => import('@/views/permission/role'),
+        meta: {
+          title: '角色管理', icon: 'form', 'menuOrder': 0,
+          btnPermissions: [
+            { title: '新增', type: 'add' },
+            { title: '编辑', type: 'edit' },
+            { title: '删除', type: 'delete' }
+          ]
+        }
+      },
+      {
+        path: 'user',
+        name: 'user',
+        component: () => import('@/views/permission/user'),
+        meta: {
+          title: '用户管理', icon: 'form',
+          'menuOrder': 0,
+          btnPermissions: [
+            { title: '新增', type: 'add' },
+            { title: '批量删除', type: 'batchDelete' },
+            { title: '编辑', type: 'edit' },
+            { title: '删除', type: 'delete' }
+          ]
+        }
+      }
+    ]
+  },
   {
     path: '/news',
     component: Layout,
@@ -151,6 +181,10 @@ export const asyncRoutes = [
   }
 ]
 
+export const asyncRoutes = [
+  ...configRoutes
+]
+
 /**
  *   需要最后404页面
  * @type
@@ -166,7 +200,6 @@ const createRouter = () => new Router({
 
 const router = createRouter()
 
-// Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
   const newRouter = createRouter()
   router.matcher = newRouter.matcher // reset router

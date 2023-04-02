@@ -88,6 +88,11 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="less" scoped>
+///deep/ .el-form-item__label {
+//  color: #606266;
+//}
+//.el-form-item__label {
+//  color: #606266;
+//}
 </style>

@@ -7,15 +7,17 @@
       @onSearch="handleEventSearch"
     >
       <template slot="operationButton">
-        <el-button @click="opDialog('add','')"> 新增</el-button>
-        <el-button @click="handlerBatchDeletion" type="danger">批量删除</el-button>
-        <el-button @click="batchSync" type="warning">批量同步</el-button>
+        <el-button @click="opDialog('add','')" v-permission="['addMenu']"> 新增菜单</el-button>
+        <el-button @click="opDialogAddBtn()" v-permission="['addButton']" > 新增按钮</el-button>
+        <el-button @click="handlerBatchDeletion" type="danger" v-permission="['batchDelete']" >批量删除</el-button>
+        <el-button @click="batchSync" type="warning" v-permission="['batchSync']" >批量同步</el-button>
       </template>
     </SearchPanel>
     <!-- E 搜索栏目 -->
 
     <!-- S 表格 -->
     <el-table-custom
+      class="my-navigation"
       :rowKey="(record) => record.id"
       :columns="columns"
       :data-source="dataSource"
@@ -31,12 +33,31 @@
       <template slot="title" slot-scope="scope">
         <span style="color: #20a0ff">{{ scope.scope.title }}</span>
       </template>
+
+      <template slot="menubuttonList" slot-scope="{scope:{menubuttonList}}">
+        <template v-for="(item,index) in menubuttonList">
+          <menuButton :key="index" :btnType="item.type" :btnId="item.id" :name="item.name" @close="deleteBtnFn"
+          ></menuButton>
+        </template>
+
+      </template>
+
       <template slot="operation" slot-scope="scope">
         <el-button @click="opDialog('edit',scope.scope)"> 编辑</el-button>
         <el-button @click="deleteData(scope.scope)" type="danger"> 删除</el-button>
       </template>
     </el-table-custom>
     <!-- E 表格 -->
+
+    <!--  S 分页  -->
+    <Page
+      @changeSize="changeSize"
+      @changeNum="changeNum"
+      :total="totalCount"
+      :pageNum="pageNum"
+      :pageSize="pageSize"
+    ></Page>
+    <!--  E 分页  -->
 
     <!-- S 弹框删除操作 -->
     <commonAction
@@ -47,7 +68,7 @@
     >
     </commonAction>
     <!-- E 弹框删除操作 -->
-
+    <!-- S 新增或者修改表单 -->
     <OpFormPannel
       :op-form-dialog="opFormDialog"
       :opFormItems="opFormItems"
@@ -56,63 +77,102 @@
       @opCloseForm="opCloseForm"
       @onFormSubmit="onOpFormSubmit"
     >
-      <!-- S 父级菜单 -->
       <template slot="-1">
-        <el-form-item label="父级菜单">
-          <el-select v-model="opFormModelLocal.parentMenu" placeholder="请选择" clearable>
-            <el-option
-              v-for="item in menuItemList.parents"
-              :key="item.name"
-              :label="item.meta.title"
-              :value="item.meta.title +','+ item.name"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </template>
-      <!-- E 父级菜单 -->
+        <!-- S 操作菜单  -->
+        <template v-if="showMenuBtnVisible">
+          <!-- S 父级菜单 -->
+          <el-form-item label="父级菜单">
+            <el-select v-model="opFormModelLocal.parentMenu" placeholder="请选择" clearable>
+              <el-option
+                v-for="item in menuItemList.parents"
+                :key="item.name"
+                :label="item.meta.title"
+                :value="item.meta.title +','+ item.name"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <!-- E 父级菜单 -->
+          <!-- S 二级菜单 -->
+          <el-form-item label="菜单名称" prop="title"
 
-      <!-- S 二级菜单 -->
-      <!--:rules="[{ required: true, message: '请输入菜单菜单名称', trigger: 'change' }]"-->
-      <template slot="-1">
-        <el-form-item label="菜单名称" prop="title"
-
-        >
-          <el-select
-            clearable
-            v-model="opFormModelLocal.title"
-            @change="selectOpMenuFn($event)"
-            filterable
-            allow-create
-            default-first-option
-            placeholder="请选择"
           >
-            <el-option
-              v-for="item in menuItemList.children"
-              :key="item.name"
-              :label="item.meta.title"
-              :value="item.meta.title"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </template>
-      <!-- E 二级菜单 -->
+            <el-input v-model="opFormModelLocal.title" clearable/>
+          </el-form-item>
+          <!-- E 二级菜单 -->
+          <!-- S 菜单name -->
+          <el-form-item label="菜单Name" prop="name">
+            <el-input v-model="opFormModelLocal.name" clearable/>
+          </el-form-item>
+          <!-- E 菜单name -->
+          <el-form-item label="菜单排序" prop="menuOrder">
+            <el-input v-model="opFormModelLocal.menuOrder" clearable/>
+          </el-form-item>
+        </template>
+        <!-- E 操作菜单  -->
 
-      <!-- S 菜单name -->
-      <!-- :rules="[{ required: true, message: '请输入菜单name', trigger: 'blur' }]" -->
-      <template slot="-1">
-        <el-form-item label="菜单Name" prop="name">
-          <el-input v-model="opFormModelLocal.name" clearable/>
-        </el-form-item>
+        <!-- S 操作按钮  -->
+        <template v-if="!showMenuBtnVisible">
+          <!-- 一级菜单 -->
+          <el-form-item label="父级菜单">
+            <el-select @change="getSecondsMenuByMenuId" v-model="opFormModelLocal.firMenuId" placeholder="请选择"
+                       clearable
+            >
+              <el-option
+                v-for="item in firMenuList"
+                :key="item.id"
+                :label="item.title"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <!-- 二级菜单 -->
+          <el-form-item label="二级菜单">
+            <el-select v-model="opFormModelLocal.menuId" placeholder="请选择" clearable>
+              <el-option
+                v-for="item in secMenuList"
+                :key="item.id"
+                :label="item.title"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <!-- 按钮名称 -->
+          <el-form-item label="按钮名称" prop="name">
+            <el-input v-model="opFormModelLocal.name" clearable/>
+          </el-form-item>
+          <!-- 按钮type -->
+          <el-form-item label="按钮type" prop="name">
+            <el-input v-model="opFormModelLocal.type" clearable/>
+          </el-form-item>
+
+        </template>
+        <!-- E 操作按钮  -->
+
       </template>
-      <!-- E 菜单name -->
+
+
+      <!-- 显示按钮 -->
+
     </OpFormPannel>
+    <!-- E 新增或者修改表单 -->
+
   </div>
 </template>
 <script>
-
-import { batchInsert, category, dataBatchDelete, dataDelete, menuList, saveOrUpdate } from '@/api/permission/menu'
+import Page from '@/components/Page/index'
+import {
+  indertBtn,
+  batchInsert,
+  category,
+  dataBatchDelete,
+  dataDelete,
+  deleteBtn, getSecMenuList,
+  menuList,
+  saveOrUpdate
+} from '@/api/permission/menu'
 import SearchPanel from '@/components/SearchPanel/SearchPanel'
 import queryListmixin from '@/mixins/queryListMixin'
 import CommonAction from '@/components/ActionDialog/CommonAction'
@@ -123,17 +183,25 @@ import { getArrJsonDif } from '@/utils'
 import comActionMixin from '@/mixins/comActionMixin'
 import OpFormPannel from '@/components/DataOperationPannel/OpFormPannel'
 
+import Sortable from 'sortablejs'
+import menuButton from '@/views/permission/menu/menuButton'
+
 export default {
   name: 'SystemMenu',
-  components: { OpFormPannel, CommonAction, SearchPanel },
+  components: { Page, OpFormPannel, CommonAction, SearchPanel, menuButton },
   mixins: [queryListmixin, opFormMixin, comActionMixin],
   filters: {},
   data() {
     return {
+      showMenuBtnVisible: true, // 调整显示按钮还是菜单  true 显示按钮 false 显示菜单
+      firMenuList: [], // 一级菜单
+      secMenuList: [], // 二级菜单
       opFormModelLocal: {
+        id: '',
         parentMenu: '',
         title: '',
-        name: ''
+        name: '',
+        menuOrder: ''
       },
       // 下拉菜单
       menuItemList: { 'parents': [], 'children': [] },
@@ -143,6 +211,8 @@ export default {
         { label: 'ID', prop: 'id' },
         { label: '菜单名称', prop: 'title' },
         { label: '菜单name', prop: 'name' },
+        { label: '按钮', prop: 'menubuttonList', isSlot: true },
+        { label: '菜单排序', prop: 'menuOrder' },
         { label: '操作', isSlot: true, prop: 'operation', fixed: 'right', dataIndex: '', align: 'center' }
       ]
     }
@@ -189,19 +259,45 @@ export default {
       let filterAsyncRoutes = asyncRoutes.filter(item => {
         return item.path !== '*'
       })
+      // 是否有重复项目有重复项则提示终止操作
+      let routerNameArr = []
+
+      function getNameList() {
+        filterAsyncRoutes.forEach(item => {
+          routerNameArr.push(item.name)
+          if (item.children.length !== 0) {
+            item.children.forEach(i => {
+              routerNameArr.push(i.name)
+            })
+          }
+        })
+      }
+
+      getNameList()
+
+      function findDuplicates(arr) {
+        return arr.filter((item, index) => arr.indexOf(item) !== index)
+      }
+
+      const duplicates = findDuplicates(routerNameArr)
+      if (duplicates.length !== 0) {
+        return this.$message.error(`抱歉！路由存在name:${duplicates.toString()}`)
+      }
+
       const routeLink = filterAsyncRoutes.map(item => {
         // 一级菜单
         let linker = {
           'title': item.meta.title,
           'name': item.name,
-          'meta':item.meta,
+          'meta': item.meta,
           'children': this.batchSyncChild(item.children)
         }
-        // 二级菜单
+        // 二级菜单\
         return linker
       })
       batchInsert(routeLink).then(res => {
         this.$message.success(`更新成功`)
+        this.getItemList()
       })
     },
 
@@ -215,7 +311,7 @@ export default {
           return {
             'title': item.meta.title,
             'name': item.name,
-            'meta':item.meta,
+            'meta': item.meta,
             'button': item.meta.btnPermissions || []
           }
         })
@@ -227,6 +323,7 @@ export default {
      *  打开对话框 (包含新增修改)
      */
     async opDialog(opera, param) {
+      this.showMenuBtnVisible = true // 打开显示按钮
       const res = await category()
       let differ = getArrJsonDif(res.data.data, this.menuItemList.parents, 'name')
       let newRouter = differ.map(res => {
@@ -237,10 +334,12 @@ export default {
       let _param = JSON.parse(JSON.stringify(param))
       this.opFormDialog.visible = true
       this.$set(this.opFormModelLocal, 'id', _param.id)
-      this.$set(this.opFormModelLocal, 'parentMenu', '')
-      this.$set(this.opFormModelLocal, 'title', '')
-      this.$set(this.opFormModelLocal, 'name', '')
       this.opFnName = saveOrUpdate
+
+      for (let item in this.opFormModelLocal) {
+        this.opFormModelLocal[item] = param == null ? '' : param[item]
+      }
+
       if (opera === 'add') {
         this.opFormDialog.buttonTitle = '添加'
       } else if (opera === 'edit') {
@@ -248,6 +347,44 @@ export default {
         this.opFormModelLocal = _param
         this.$set(this.opFormModelLocal, 'parentMenu', _param.fid === 0 ? '' : _param.ftitle + ',' + _param.fname)
       }
+    },
+
+    /**
+     *  显示添加按钮
+     */
+    async opDialogAddBtn() {
+      this.showMenuBtnVisible = false
+      this.opFormDialog = { title: '新增按钮', visible: true, buttonTitle: '新增按钮' }
+      const { data: { data } } = await category()
+      this.firMenuList = data
+      this.opFormModelLocal = { firMenuId: '', menuId: '', type: '', name: '' }
+      this.opFnName = indertBtn
+    },
+
+    /**
+     *  通过一级菜单id获取二级菜单
+     */
+
+    async getSecondsMenuByMenuId(menuId) {
+      this.secMenuList.length = 0
+      if (menuId !== '') {
+        const { data: { data } } = await getSecMenuList({ 'id': menuId })
+        this.secMenuList = data
+      }
+    },
+
+    /**
+     *  删除按钮
+     */
+    deleteBtnFn(params) {
+      this.comActionDialog = {
+        visible: true,
+        title: '按钮删除',
+        message: '是否确认删除改按钮?',
+        buttonTitle: '删除'
+      }
+      this.comActionCondition = { id: params }
+      this.comFnName = deleteBtn
     },
 
     /**
@@ -284,7 +421,7 @@ export default {
   watch: {
     'opFormModelLocal.parentMenu': {
       handler(value) {
-        if (value !== '' && value !== 0) {
+        if (value !== '' && value !== 0 && typeof (value) !== 'undefined') {
           const routerChindren = JSON.parse(JSON.stringify(this.menuItemList.parents))
           const children = routerChindren.find(res => {
             if (res.name.toLowerCase() === value.split(',')[1].toLowerCase()) {

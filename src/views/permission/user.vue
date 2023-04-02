@@ -8,8 +8,8 @@
 
     >
       <template slot="operationButton">
-        <el-button @click="opearDialog('add','')"> 新增</el-button>
-        <el-button @click="batchDelete" type="danger"> 批量删除</el-button>
+        <el-button @click="opearDialog('add','')" v-permission="['add']" > 新增</el-button>
+        <el-button @click="batchDelete" type="danger" v-permission="['batchDelete']" > 批量删除</el-button>
       </template>
     </SearchPanel>
     <!-- E 搜索栏目 -->
@@ -29,11 +29,21 @@
       :table-loading="searchBtnLoading"
     >
       <template slot="operation" slot-scope="{ scope }">
-        <el-button @click="opearDialog('edit',scope)"> 编辑</el-button>
-        <el-button @click="deleteData(scope)" type="danger"> 删除</el-button>
+        <el-button @click="opearDialog('edit',scope)" v-permission="['edit']" > 编辑</el-button>
+        <el-button @click="deleteData(scope)" type="danger" v-permission="['delete']" > 删除</el-button>
       </template>
     </el-table-custom>
     <!-- E 表格 -->
+
+    <!--  S 分页  -->
+    <Page
+      @changeSize="changeSize"
+      @changeNum="changeNum"
+      :total="totalCount"
+      :pageNum="pageNum"
+      :pageSize="pageSize"
+    ></Page>
+    <!--  E 分页  -->
 
     <OpFormPannel
       :op-form-dialog="opFormDialog"
@@ -60,7 +70,7 @@
 </template>
 
 <script>
-
+import Page from '@/components/Page/index'
 import { dataListByPage, dataInsert, dataModify, dataDelete, batchDelete } from '@/api/permission/user'
 import SearchPanel from '@/components/SearchPanel/SearchPanel'
 import queryListmixin from '@/mixins/queryListMixin'
@@ -73,11 +83,9 @@ import { roleList } from '@/api/permission/role'
 import opFormMixins from '@/mixins/opFormMixin'
 import comActionMixin from '@/mixins/comActionMixin'
 
-import ccc from './ccc'
-
 export default {
   name: 'user',
-  components: { OpFormPannel, CommonAction, SearchPanel, ccc },
+  components: { Page,OpFormPannel, CommonAction, SearchPanel},
   mixins: [queryListmixin, opFormMixins, comActionMixin],
   filters: {},
   data() {

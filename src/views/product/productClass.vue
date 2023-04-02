@@ -36,6 +36,16 @@
     </el-table-custom>
     <!-- E 表格 -->
 
+    <!--  S 分页  -->
+    <Page
+      @changeSize="changeSize"
+      @changeNum="changeNum"
+      :total="totalCount"
+      :pageNum="pageNum"
+      :pageSize="pageSize"
+    ></Page>
+    <!--  E 分页  -->
+
     <!-- S 弹框删除操作 -->
     <common-action
       :comActionDialog="comActionDialog"
@@ -71,7 +81,7 @@
 </template>
 
 <script>
-
+import Page from '@/components/Page/index'
 import { dataListByPage, dataInsert, dataDelete, category, dataModify } from '@/api/product/productClass'
 import SearchPanel from '@/components/SearchPanel/SearchPanel'
 import queryListmixin from '@/mixins/queryListMixin'
@@ -86,7 +96,7 @@ import ImageUpload from '@/components/UploadFile/ImageUpload'
 
 export default {
   name: 'ProdutClass',
-  components: { ImageUpload, FormData, CommonAction, SearchPanel },
+  components: { Page, ImageUpload, FormData, CommonAction, SearchPanel },
   mixins: [queryListmixin, comActionMixin, opFormMixin],
   filters: {},
   data() {
@@ -133,7 +143,7 @@ export default {
         let obj = {}
         obj.value = item.classid
         obj.label = transformClassPower(item.classpower) + item.classname
-        obj.disabled = disableValue == item.classid ? true : false
+        obj.disabled = item.classpower.indexOf(disableValue.classpower) === 0 ? true : false
         return obj
       })
     },
@@ -158,7 +168,7 @@ export default {
      *  打开对话框
      */
     async opDialog(opera, param) {
-      await this.getCategoryList(param.classid)
+      await this.getCategoryList(param)
       this.opFormItems[1].selectValue = this.categoryList
       this.uploadImgList = []
       this.opFormItems = this.opFormItems.map(item => {

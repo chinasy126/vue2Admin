@@ -48,23 +48,25 @@ router.beforeEach(async(to, from, next) => {
   // determine whether the user has logged in
   const hasToken = getToken()
 
+  // 检测是否有token / 没有token 跳转登录携带者当前URl
   if (hasToken) {
     if (to.path === '/login') {
-      // if is logged in, redirect to the home page
+      // 如果存在token 是登录页页面直接跳转首页
       next({ path: '/' })
       NProgress.done()
     } else {
+      // 登录页后获取不到用户名重新获取用户信息
       const hasGetUserInfo = store.getters.name
       if (hasGetUserInfo) {
         next()
       } else {
         try {
-          // get user info
+          // 获取用户信息，获取菜单信息
           await store.dispatch('user/getInfo')
           await store.dispatch('permission/generateRoutes')
+          // 获取后端返回所有菜单
           const permission_routes = store.getters.permission_routes
           const asyncRouter = filterMenu(permission_routes)
-          console.log(asyncRouter)
           router.addRoutes(asyncRouter)
           //   next()
           next({ ...to, replace: true })
@@ -97,7 +99,7 @@ router.beforeEach(async(to, from, next) => {
  * @returns {*}
  */
 const filterMenu = (permission_routes) => {
-  let router = constantRoutes
+  let router = constantRoutes // 静态路由菜单
   return permission_routes.filter(item => {
     let res = router.find(i => i.path === item.path)
     if (!res) {

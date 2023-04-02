@@ -8,25 +8,11 @@
       @onSearch="handleEventSearch"
     >
       <template slot="operationButton">
-        <el-button @click="opearDialog('add','')" v-permission="['add']"> 新增</el-button>
-
-        <el-upload :action="importExcelUrl" :on-success="onSuccess" :show-file-list="false"
-                   v-permission="['import']"
-                   :headers="headers"
-        >
-          <el-button size="small" type="primary" style="margin-left: 10px; margin-right: 10px;">导入</el-button>
-        </el-upload>
-
-        <el-button type="danger" @click="exportData()"
-                   v-permission="['export']"
-                   icon="el-icon-s-order"
-        > 导出
-        </el-button>
-
-        <el-button type="danger" @click="batchDeletion()"
-                   v-permission="['batchDeletion']"
-                   icon="el-icon-s-order"
-        > 批量删除
+        <el-button @click="opDialog('add','')" v-permission="['add']"> 新增</el-button>
+        <FileUpload :fileUploadFnName="fileUploadFnName" uploadBtnName="文件上传" v-permission="['import']"></FileUpload>
+        <el-button type="danger" @click="exportData()" icon="el-icon-s-order" v-permission="['export']"> 导出</el-button>
+        <el-button type="danger" @click="opBatchDelAialog()" icon="el-icon-s-order" v-permission="['batchDeletion']">
+          批量删除
         </el-button>
       </template>
     </SearchPanel>
@@ -50,102 +36,99 @@
         <span style="color: #20a0ff">{{ scope.scope.title }}</span>
       </template>
       <template slot="operation" slot-scope="scope">
-        <el-button @click="opearDialog('edit',scope.scope)" v-permission="['edit']"> 编辑</el-button>
-        <el-button @click="deleteData(scope.scope)" type="danger" v-permission="['delete']"> 删除</el-button>
+        <el-button size="mini" @click="opDialog('edit',scope.scope)" v-permission="['edit']"> 编辑</el-button>
+        <el-button size="mini" @click="opDelDialog(scope.scope)" type="danger" v-permission="['delete']"> 删除</el-button>
       </template>
     </el-table-custom>
     <!-- E 表格 -->
 
+    <!--  S 分页  -->
+    <Page
+      @changeSize="changeSize"
+      @changeNum="changeNum"
+      :total="totalCount"
+      :pageNum="pageNum"
+      :pageSize="pageSize"
+    ></Page>
+    <!--  E 分页  -->
+
     <!-- S 弹框删除操作 -->
-    <common-action
-      :visible="commonActionVisible"
-      title="编辑"
-      :message="message"
-      :condition="conditionData"
-      :apiUrl="apiUrl"
+    <commonAction
+      :comActionDialog="comActionDialog"
+      :comActionCondition="comActionCondition"
+      :comFnName="comFnName"
       @refresh="refreshList"
     >
-    </common-action>
+    </commonAction>
     <!-- E 弹框删除操作 -->
 
-    <FormData
-      :dialogVisible="formDialogVisible"
-      :form="opeartionForm"
-      :rules="rules"
-      :otherFormData="operationFormData"
-      :operation-fn-name="operationFnName"
-      @closeForm="closeForm"
+    <!-- S 新增修改 -->
+    <OpFormPannel
+      :opFormDialog="opFormDialog"
+      :opFormItems="opFormItems"
+      :opFormRules="opFormRules"
+      :opFormBtnLoading="opFormBtnLoading"
+      @opCloseForm="opCloseForm"
+      @onFormSubmit="onOpFormSubmit"
     >
-
       <template v-slot:3>
         <el-form-item label="相关图片">
-          <upload-img :img="operationFormData.pic" @uploadSuccess="uploadSuccess"></upload-img>
+          <!-- 图片上传组件 -->
+          <ImageUpload ref="fileUpload"
+                       upload-folder-name="news"
+                       :uploadImgList="uploadImgList"
+                       @uploadSuccess="uploadSuccess"
+          />
         </el-form-item>
       </template>
-
-
-    </FormData>
-
+    </OpFormPannel>
+    <!-- E 新增修改 -->
   </div>
 </template>
 
 <script>
-
-import {
-  dataListByPage,
-  newsInsert,
-  newsDelete,
-  getDetail,
-  newsModify,
-  exportExcelData,
-  importExcelData
-} from '@/api/news'
+import Page from '@/components/Page/index'
+import { batchDelete, dataListByPage, exportExcelData, importExcelData, newsDelete, saveOrUpdate } from '@/api/news'
 import SearchPanel from '@/components/SearchPanel/SearchPanel'
+import queryListmixin from '@/mixins/queryListMixin'
 import CommonAction from '@/components/ActionDialog/CommonAction'
 import { downloadFile, parseTime } from '@/utils'
-import UploadImg from '@/components/UploadFile/uploadImg'
-import FormData from '@/components/DataOperationPannel/OpFormPannel'
-import queryListMixin from '@/mixins/queryListMixin'
 
-const opeartionForm = [
-  { label: '标题', prop: 'title', type: 'input' },
-  { label: '副标题', prop: 'fTitle', type: 'input' },
-  { label: '日期', prop: 'update', type: 'date', value: parseTime(new Date(), '{y}-{m}-{d}') },
-  { label: '推荐值', prop: 'top', type: 'number' },
-  { label: '访问量', prop: 'num', type: 'number' }
-]
+import opFormMixin from '@/mixins/opFormMixin'
+import comActionMixin from '@/mixins/comActionMixin'
+
+import ImageUpload from '@/components/UploadFile/ImageUpload'
+import FileUpload from '@/components/UploadFile/FileUpload'
+import OpFormPannel from '@/components/DataOperationPannel/OpFormPannel'
 
 export default {
-  components: { FormData, UploadImg, CommonAction, SearchPanel },
-  mixins: [queryListMixin],
+  components: { Page, OpFormPannel, FileUpload, ImageUpload, CommonAction, SearchPanel },
+  mixins: [queryListmixin, opFormMixin, comActionMixin],
   filters: {},
   data() {
-    return {
-      operationFormData: {},
-      formDialogVisible: false,
-      importExcelUrl: `${process.env.VUE_APP_BASE_API}/news/import`,
-      rules: {
-        title: [
-          { required: true, message: '请输入名称', trigger: 'blur' },
-          { min: 1, max: 255, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-        ],
-        update: [
-          { required: true, message: '请输入日期', trigger: 'blur' }
-        ]
-      },
+    /**
+     * 验证函数
+     * @param rule
+     * @param value
+     * @param callback
+     */
+    const titleFn = (rule, value, callback) => {
+      if (value !== '') {
+        callback()
+      } else {
+        callback(new Error('请输入标题'))
+      }
+    }
 
-      opeartionForm: opeartionForm,
-      message: '是否确认删除本条内容?',
-      conditionData: {}, // 删除弹框操作
-      apiUrl: newsDelete,
-      operationFnName: () => {
-      },
-      commonActionVisible: false,
-      getListFnName: dataListByPage, // 主页面查询
+    return {
+      // 搜索查询接口
+      getListFnName: dataListByPage,
+      // 搜索每一项
       searchPannelList: [
         { type: 'input', name: '标题', prop: 'title' },
         { type: 'date', name: '时间', prop: 'update' }
       ],
+      // 表格列表每一项内容
       columns: [
         { label: 'ID', prop: 'id' },
         { label: '标题', prop: 'title', isSlot: true },
@@ -153,93 +136,113 @@ export default {
         { label: '推荐', prop: 'top' },
         { label: '时间', prop: 'update' },
         { label: '副标题', prop: 'fTitle' },
-        { label: '操作', isSlot: true, prop: 'operation', fixed: 'right', dataIndex: '', align: 'center' }
-      ]
+        { label: '操作', width:150, isSlot: true, prop: 'operation', fixed: 'right', dataIndex: '', align: 'center' }
+      ],
+      // 新增修改功能每一项
+      opFormItems: [
+        { prop: 'id', value: '' },
+        { label: '标题', prop: 'title', type: 'input' },
+        { label: '副标题', prop: 'fTitle', type: 'input' },
+        { label: '日期', prop: 'update', type: 'date', value: parseTime(new Date(), '{y}-{m}-{d}') },
+        { label: '推荐值', prop: 'top', type: 'number' },
+        { label: '访问量', prop: 'num', type: 'number' }
+      ],
+      // 新增校验每一项
+      opFormRules: {
+        title: [
+          { required: true, trigger: 'blur', validator: titleFn },
+          { min: 5, max: 100, message: '长度在 5 到 100 个字符', trigger: 'blur' }
+        ],
+        update: [
+          { required: true, message: '请输入日期', trigger: 'blur' }
+        ]
+      },
+      // 图片上传组件 显示图片列表
+      uploadImgList: [],
+      // 插槽新增数据
+      opFormModelLocal: { 'pic': '' },
+      // 文件导入组件方法
+      fileUploadFnName: importExcelData
     }
   },
   created() {
-
   },
   methods: {
-    /**
-     *  表格导入
-     */
-    importData() {
-      importExcelData().then(res => {
-
-      })
-    },
     /**
      *  导出数据
      */
     exportData() {
-      const param = this.$refs.searchPannelRef.searchForm
-      exportExcelData(param).then(({ data }) => {
+      let params = {}
+      Object.assign(params, this.searchForm)
+      exportExcelData(params).then(({ data }) => {
         downloadFile(data, '新闻')
       })
-    },
-    closeForm() {
-      this.formDialogVisible = false
-      this.getItemList()
-    },
-    uploadSuccess(params) {
-      this.$set(this.operationFormData, 'pic', params)
-      console.log(params)
     },
     /**
      *  打开对话框
      */
-    opearDialog(opera, param) {
-      this.opeartionForm = JSON.parse(JSON.stringify(opeartionForm))
+    opDialog(opera, param) {
+      this.opFnName = saveOrUpdate
+      this.uploadImgList = []
+      this.opFormItems = this.opFormItems.map(item => {
+        item.value = typeof (param[item.prop]) !== 'undefined' || item.type === 'date' ?
+          (opera === 'add' ? parseTime(new Date(), '{y}-{m}-{d}') : param[item.prop]) : ''
+        return item
+      })
       if (opera === 'add') {
-        this.operationFnName = newsInsert
-        this.formDialogVisible = true
+        this.opFormDialog.title = '新增'
+        this.opFormDialog.buttonTitle = '新增'
       } else if (opera === 'edit') {
-        this.operationFormData.pic = param.pic
-        this.operationFnName = newsModify
-        const opForm = this.opeartionForm
-        opForm.push({ prop: 'id', value: param.id })
-        this.opeartionForm = opForm.map(item => {
-          item.value = param[item.prop]
-          return item
-        })
-
-        this.formDialogVisible = true
+        this.opFormDialog.title = '修改'
+        this.opFormDialog.buttonTitle = '修改'
+        // 图片
+        this.opFormModelLocal.pic = param.pic
+        if (param.pic !== '' && typeof (param.pic) !== 'object') {
+          this.uploadImgList = [{ 'url': param.pic }]
+        }
       }
-
+      this.opFormDialog.visible = true
     },
-
     /**
-     *  操作后刷新列表
+     *  上传图片获取图片地址
      */
-    refreshList() {
-      this.commonActionVisible = false
-      this.getItemList()
-    },
-
-    /**
-     * 删除数据
-     * @param param
-     */
-    deleteData(param) {
-      this.conditionData = param.id
-      this.commonActionVisible = true
-    },
-
-    /**
-     *  上传从成功
-     */
-    onSuccess(response, file, fileList) {
-      if (response.code === 20000) {
-        this.getItemList()
+    uploadSuccess(params, type) {
+      if (type === 'upload') {
+        this.$message.success(`图片上传成功!`)
       }
+      this.opFormModelLocal.pic = params.length > 0 ? params[0].url : ''
     },
-
+    /**
+     *  合并数据项目
+     */
+    mergeOperationForm(params) {
+      Object.assign(params, this.opFormModelLocal)
+    },
+    /**
+     *  删除对话框
+     */
+    opDelDialog(param) {
+      this.comFnName = newsDelete
+      this.comActionCondition = { id: param.id }
+      this.comActionDialog.visible = true
+    },
     /**
      *  批量删除
      */
-    batchDeletion() {
-      console.log(this.selectItemList)
+    opBatchDelAialog() {
+      if (this.selectItemList.length === 0) {
+        this.$message.error('请选择要删除的数据')
+        return true
+      }
+      this.comActionDialog = {
+        title: '批量删除',
+        visible: true,
+        buttonTitle: '批量删除',
+        message: '是否确认批量删除这些内容?'
+      }
+      const ids = this.selectItemList.map(i => i.id)
+      this.comActionCondition = { id: ids }
+      this.comFnName = batchDelete
     }
 
   },
