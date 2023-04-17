@@ -19,7 +19,7 @@
       :rowKey="(record) => record.id"
       :columns="columns"
       :data-source="dataSource"
-      @selection-change="handleSelectionChange"
+      @selectionChange="handleSelectionChange"
       @changeSize="changeSize"
       @changeNum="changeNum"
       :row-key="(record)=> record.id "
@@ -163,6 +163,7 @@ export default {
       if (opera === 'add') {
         this.opFormItems = opFormItems.map(item => {
           item.value = ''
+          item.disabled = false
           return item
         })
         this.opFormDialog.title = '新增'
@@ -171,6 +172,9 @@ export default {
       } else if (opera === 'edit') {
 
         this.opFormItems = opFormItems.map(item => {
+          if (item.prop === 'username') {
+            item.disabled = true
+          }
           item.value = param[item.prop]
           return item
         })

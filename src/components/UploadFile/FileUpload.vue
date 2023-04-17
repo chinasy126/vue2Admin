@@ -122,6 +122,7 @@ export default {
         } else {
           this.$message.error('上传文件错误!')
         }
+        this.$emit('onSuccess', 'success')
       })
     }
   }

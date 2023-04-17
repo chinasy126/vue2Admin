@@ -64,7 +64,7 @@
 
     <!-- S 放大图片显示区域 -->
     <el-dialog title="查看图片" :visible.sync="uploadDialog.visible" :modal="false">
-      <el-image width="100%" :src="prefix+dialogImg"
+      <el-image width="100%" :src="dialogImg"
       ></el-image>
     </el-dialog>
     <!-- E 放大图片显示区域 -->

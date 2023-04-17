@@ -276,3 +276,36 @@ export function transformClassPower(str) {
     return symbol
   }
 }
+
+/**
+ * 删除图片URL正则表达式
+ * @param html
+ * @param basePath
+ * @returns {*}
+ */
+export function replaceImgSrc(html, basePath) {
+  const regex = /<img.*?src="([^"]+)".*?>/g;
+  return html.replace(regex, function(match, src) {
+    if (src.indexOf(basePath) === 0) {
+      const relativePath = src.substr(basePath.length);
+      return `<img src="${relativePath}">`;
+    }
+    return match;
+  });
+}
+
+/**
+ * 新增正则
+ * @param html
+ * @param prefix
+ * @returns {*}
+ */
+export function addImgSrcPrefix(html, prefix) {
+  const regex = /<img.*?src="([^"]+)".*?>/g;
+  return html.replace(regex, function(match, src) {
+    if (!src.startsWith('http') && !src.startsWith('//')) {
+      return `<img src="${prefix}${src}">`;
+    }
+    return match;
+  });
+}

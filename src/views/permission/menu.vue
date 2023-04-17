@@ -86,8 +86,8 @@
               <el-option
                 v-for="item in menuItemList.parents"
                 :key="item.name"
-                :label="item.meta.title"
-                :value="item.meta.title +','+ item.name"
+                :label="item.title"
+                :value="item.title +','+ item.name"
               >
               </el-option>
             </el-select>
@@ -324,13 +324,9 @@ export default {
      */
     async opDialog(opera, param) {
       this.showMenuBtnVisible = true // 打开显示按钮
-      const res = await category()
-      let differ = getArrJsonDif(res.data.data, this.menuItemList.parents, 'name')
-      let newRouter = differ.map(res => {
-        res.meta = { title: res.title }
-        return res
-      })
-      this.menuItemList.parents.push(...newRouter)
+      const {data:{ data:dbMenuList }} = await category()
+
+      this.menuItemList.parents = dbMenuList
       let _param = JSON.parse(JSON.stringify(param))
       this.opFormDialog.visible = true
       this.$set(this.opFormModelLocal, 'id', _param.id)
@@ -419,20 +415,19 @@ export default {
 
   },
   watch: {
-    'opFormModelLocal.parentMenu': {
-      handler(value) {
-        if (value !== '' && value !== 0 && typeof (value) !== 'undefined') {
-          const routerChindren = JSON.parse(JSON.stringify(this.menuItemList.parents))
-          const children = routerChindren.find(res => {
-            if (res.name.toLowerCase() === value.split(',')[1].toLowerCase()) {
-              console.log(res.children)
-              return res.children
-            }
-          })
-          this.menuItemList.children = children.children
-        }
-      }
-    },
+    // 'opFormModelLocal.parentMenu': {
+    //   handler(value) {
+    //     if (value !== '' && value !== 0 && typeof (value) !== 'undefined') {
+    //       const routerChindren = JSON.parse(JSON.stringify(this.menuItemList.parents))
+    //       const children = routerChindren.find(res => {
+    //         if (res.name.toLowerCase() === value.split(',')[1].toLowerCase()) {
+    //           return res.children
+    //         }
+    //       })
+    //       this.menuItemList.children = children.children
+    //     }
+    //   }
+    // },
     asyncMenuList: {
       handler(val) {
       }

@@ -22,12 +22,14 @@ export default {
      * @returns {Promise<void>}
      */
     async handleEventSearch(params) {
+      this.pageNum = 1
       this.searchForm = { ...params }
       await this.getItemList()
     },
+
     /**
      * 从接口获取返回数据列表
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>}
      */
     async getItemList() {
       this.searchBtnLoading = true
@@ -36,6 +38,13 @@ export default {
       try {
         const res = await this.getListFnName(params, this.pageNum, this.pageSize)
         if (res.code === 20000) {
+
+          // 如果遇到当前页面仅有一条数据 执行了删除操作则 刷新跳转到上一页面
+          if (res.data.data.records.length === 0 && this.pageNum !== 1) {
+            this.pageNum = this.pageNum - 1
+            await this.getItemList()
+            return true
+          }
           const result = res.data.data
           const { total, current, size, records } = result
           this.totalCount = res.data.data.total
@@ -47,7 +56,7 @@ export default {
           this.dataSource = []
         }
       } catch (e) {
-        // console.log(e)
+        console.error(e)
       } finally {
         this.searchBtnLoading = false
         this.tableLoading = false

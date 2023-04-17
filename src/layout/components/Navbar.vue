@@ -7,7 +7,7 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container">
         <div class="avatar-wrapper">
-          <img :src="prefix+avatar+'?imageView2/1/w/80/h/80'" class="user-avatar" @click="showUserInfo">
+          <img :src="prefix+avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
           <i class="el-icon-caret-bottom"/>
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -16,6 +16,10 @@
               首页
             </el-dropdown-item>
           </router-link>
+
+          <el-dropdown-item @click.native="updateUserInfo">
+            <span style="display:block;">修改密码</span>
+          </el-dropdown-item>
 
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">退出登录</span>
@@ -27,10 +31,7 @@
         :visible.sync="drawer"
         :with-header="false"
       >
-        <el-row :gutter="20">
-          <el-col :span="8">用户名</el-col>
-          <el-col :span="12">{{ userInfo.name }}</el-col>
-        </el-row>
+        <update-password></update-password>
       </el-drawer>
 
     </div>
@@ -42,9 +43,16 @@ import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import store from './index'
+import UpdatePassword from '@/views/user/updatePassword'
 
 export default {
+  provide(){
+    return {
+      logout:this.logout
+    }
+  },
   components: {
+    UpdatePassword,
     Breadcrumb,
     Hamburger
   },
@@ -60,17 +68,11 @@ export default {
   data() {
     return {
       drawer: false,
-      userInfo: {
-        name: ''
-      }
     }
   },
   methods: {
-    showUserInfo() {
-      console.log(this.$store)
-      this.userInfo = this.$store.getters
+    updateUserInfo() {
       this.drawer = true
-
     },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')

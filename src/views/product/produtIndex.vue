@@ -1,7 +1,5 @@
 <template>
   <div class="app-container">
-
-
     <!-- S 搜索栏目 -->
     <SearchPanel
       :searchBtnLoading="searchBtnLoading"
@@ -77,7 +75,7 @@
 
         </el-form-item>
         <el-form-item label="内容">
-          <QuillEditor v-model="opFormModelLocal.contents" ></QuillEditor>
+          <QuillEditor :value="opFormModelLocal.contents" @changeQuillEditor="changeQuillEditor"  ></QuillEditor>
         </el-form-item>
       </template>
     </OpFormPannel>
@@ -145,6 +143,11 @@ export default {
     this.getCategoryList()
   },
   methods: {
+
+    changeQuillEditor(val){
+      this.opFormModelLocal.contents = val
+    },
+
     /**
      *  合并数据项目
      */

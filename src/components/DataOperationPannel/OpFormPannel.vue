@@ -11,7 +11,7 @@
         <slot :name="index" ></slot>
         <el-form-item :label="item.label" :prop="item.prop" :key="index" >
           <template v-if="item.type === 'input'">
-            <el-input v-model="opFormModel[item.prop]" clearable/>
+            <el-input v-model="opFormModel[item.prop]" :disabled="item.disabled" clearable/>
           </template>
           <template v-if="item.type === 'textarea'">
             <el-input v-model="opFormModel[item.prop]" type="textarea" clearable/>

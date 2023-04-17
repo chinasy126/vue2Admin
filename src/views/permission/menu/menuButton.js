@@ -13,7 +13,7 @@ export default {
       }
     },
     btnId: {
-      type: String,
+      type: Number | String,
       default: ''
     }
   },

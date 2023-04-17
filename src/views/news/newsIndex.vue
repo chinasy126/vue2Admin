@@ -9,7 +9,7 @@
     >
       <template slot="operationButton">
         <el-button @click="opDialog('add','')" v-permission="['add']"> 新增</el-button>
-        <FileUpload :fileUploadFnName="fileUploadFnName" uploadBtnName="文件上传" v-permission="['import']"></FileUpload>
+        <FileUpload :fileUploadFnName="fileUploadFnName" @onSuccess="getItemList" uploadBtnName="文件上传" v-permission="['import']"></FileUpload>
         <el-button type="danger" @click="exportData()" icon="el-icon-s-order" v-permission="['export']"> 导出</el-button>
         <el-button type="danger" @click="opBatchDelAialog()" icon="el-icon-s-order" v-permission="['batchDeletion']">
           批量删除
@@ -136,7 +136,7 @@ export default {
         { label: '推荐', prop: 'top' },
         { label: '时间', prop: 'update' },
         { label: '副标题', prop: 'fTitle' },
-        { label: '操作', width:150, isSlot: true, prop: 'operation', fixed: 'right', dataIndex: '', align: 'center' }
+        { label: '操作', width: 150, isSlot: true, prop: 'operation', fixed: 'right', dataIndex: '', align: 'center' }
       ],
       // 新增修改功能每一项
       opFormItems: [
@@ -172,11 +172,16 @@ export default {
      *  导出数据
      */
     exportData() {
-      let params = {}
+      const params = {
+        id: (() => {
+          return this.selectItemList.map(i => i.id)
+        })()
+      }
       Object.assign(params, this.searchForm)
       exportExcelData(params).then(({ data }) => {
         downloadFile(data, '新闻')
       })
+
     },
     /**
      *  打开对话框
@@ -190,6 +195,7 @@ export default {
         return item
       })
       if (opera === 'add') {
+        this.opFormModelLocal.pic = ''
         this.opFormDialog.title = '新增'
         this.opFormDialog.buttonTitle = '新增'
       } else if (opera === 'edit') {
@@ -244,7 +250,6 @@ export default {
       this.comActionCondition = { id: ids }
       this.comFnName = batchDelete
     }
-
   },
   computed: {
     /**

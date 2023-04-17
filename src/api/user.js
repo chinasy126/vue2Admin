@@ -44,3 +44,24 @@ export function getImageApi() {
     responseType: 'blob'
   })
 }
+
+export function comPassSame(data) {
+  return request({
+    url: '/user/compasssame',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 更改密码
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function updatePassword(data) {
+  return request({
+    url: '/user/updatepassword',
+    method: 'post',
+    data
+  })
+}

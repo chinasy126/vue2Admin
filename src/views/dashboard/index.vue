@@ -2,17 +2,17 @@
   <div class="dashboard-container">
     <div class="dashboard-text">name: {{ name }}</div>
     <el-button @click="getMockJsData"> mockjs</el-button>
-
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import { getList } from '@/api/table1'
+import UpdatePassword from '@/views/user/updatePassword'
 
 export default {
   name: 'Dashboard',
-  components: { },
+  components: { UpdatePassword },
   data() {
     return {
 
