@@ -9,7 +9,7 @@
       :show-file-list="false"
       :http-request="httpRequest"
     >
-      <el-button size="mini" type="primary">上传图片</el-button>
+      <el-button size="mini" type="primary">{{buttonName}}</el-button>
       <!--        <div class="div-plus"><i class="el-icon-plus avatar-uploader-icon"> </i></div>-->
     </el-upload>
     <!-- E 上传按钮 -->
@@ -40,7 +40,7 @@
         <li class="el-upload-list__item is-ready" v-for="(item,index) in uploadImgUrl" :key="index">
           <div>
             <el-image
-              :src="prefix+item.url" name="uploadImgUrl" @error="imgLoadError"
+              :src="item.url" name="uploadImgUrl" @error="imgLoadError"
               class="el-upload-list__item-thumbnail"
             ></el-image>
             <span class="el-upload-list__item-actions">
@@ -85,8 +85,7 @@ export default {
       uploadImageApi: this.uploadImageApi, // 上传文件家口地址
       uploadImgUrl: [], // 上传后的图片地址
       uploadImgIsUploading: false, // 上传功能是否显示
-      uploadImgPercentage: 0, // 上传图片百分率
-      prefix: process.env.VUE_APP_UPLOAD_API // 图片显示前缀
+      uploadImgPercentage: 0 // 上传图片百分率
     }
   },
   created() {
@@ -103,6 +102,10 @@ export default {
     }
   },
   props: {
+    buttonName: {
+      type: String,
+      default: '上传图片'
+    },
     uploadFolderName: {
       type: String,
       default: 'images'

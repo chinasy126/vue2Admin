@@ -172,15 +172,12 @@ export default {
   watch: {
     value: {
       handler(val) {
-        //  this.content = addImgSrcPrefix(val, process.env.VUE_APP_UPLOAD_API)
         this.content = val
       },
       immediate: true
     }
   },
   mounted() {
-    // this.content =
-    //   addImgSrcPrefix(this.value, process.env.VUE_APP_UPLOAD_API)
     this.content = this.value
     const sourceEditorButton = document.querySelector('.ql-insertMetric')
     sourceEditorButton.innerHTML = '<i class="el-icon-plus" style="font-size: 18px;color: black"></i>'

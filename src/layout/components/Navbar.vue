@@ -7,7 +7,7 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container">
         <div class="avatar-wrapper">
-          <img :src="prefix+avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
           <i class="el-icon-caret-bottom"/>
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -17,7 +17,11 @@
             </el-dropdown-item>
           </router-link>
 
-          <el-dropdown-item @click.native="updateUserInfo">
+          <el-dropdown-item @click.native="updateUserInfo('avatar')">
+            <span style="display:block;">修改头像</span>
+          </el-dropdown-item>
+
+          <el-dropdown-item @click.native="updateUserInfo('password')">
             <span style="display:block;">修改密码</span>
           </el-dropdown-item>
 
@@ -28,10 +32,17 @@
       </el-dropdown>
 
       <el-drawer
-        :visible.sync="drawer"
+        :visible.sync="drawerVisbile"
         :with-header="false"
       >
-        <update-password></update-password>
+        <update-password v-show="drawerType === 'password'"></update-password>
+        <ImageUpload v-if="drawerType === 'avatar'" ref="fileUpload"
+                     upload-folder-name="avatar"
+                     uploadDisplayType="other"
+                     buttonName="上传头像"
+                     @uploadSuccess="uploadSuccess" style="margin: 50px;"
+        />
+
       </el-drawer>
 
     </div>
@@ -39,20 +50,23 @@
 </template>
 
 <script>
+import ImageUpload from '@/components/UploadFile/ImageUpload'
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import store from './index'
 import UpdatePassword from '@/views/user/updatePassword'
+import { setUserAvator } from '@/api/user'
 
 export default {
-  provide(){
+  provide() {
     return {
-      logout:this.logout
+      logout: this.logout
     }
   },
   components: {
     UpdatePassword,
+    ImageUpload,
     Breadcrumb,
     Hamburger
   },
@@ -60,19 +74,29 @@ export default {
     ...mapGetters([
       'sidebar',
       'avatar'
-    ]),
-    prefix() {
-      return process.env.VUE_APP_UPLOAD_API
-    }
+    ])
+
   },
   data() {
     return {
-      drawer: false,
+      drawerVisbile: false,
+      drawerType: ''
     }
   },
   methods: {
-    updateUserInfo() {
-      this.drawer = true
+    uploadSuccess(param) {
+      if (param.length !== 0) {
+        setUserAvator({ 'avatar': param[0]['url'] })
+        this.$message.success(`头像上传成功`)
+        setTimeout(() => {
+          this.drawerVisbile = false
+        })
+        this.$store.dispatch('user/getInfo')
+      }
+    },
+    updateUserInfo(type) {
+      this.drawerType = type
+      this.drawerVisbile = true
     },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')

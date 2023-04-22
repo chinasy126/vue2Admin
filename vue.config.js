@@ -48,17 +48,8 @@ module.exports = {
           ['^' + process.env.VUE_APP_BASE_API]: '' // pathRewrite是使用proxy进行代理时，对请求路径进行重定向以匹配到正确的请求地址
         }
       },
-      // [process.env.VUE_APP_UPLOAD_PREFIX_API]: {
-      //   target: process.env.VUE_APP_UPLOAD_URL,
-      //   ws: false,
-      //   changeOrigin: true,
-      //   pathRewrite: {
-      //     ['^/' + process.env.VUE_APP_UPLOAD_PREFIX_API]: ''
-      //   }
-      // }
-      //
       [process.env.VUE_APP_UPLOAD_PREFIX_API] : {
-        target: process.env.VUE_APP_UPLOAD_URL,
+        target: process.env.VUE_APP_UPLOAD_URL, // 图片访问转换地址
         ws: false,
         changeOrigin: true,
         pathRewrite: {

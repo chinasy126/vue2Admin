@@ -151,6 +151,7 @@ export default {
             this.$router.push({ path: this.redirect || '/' })
             this.loading = false
           }).catch((e) => {
+            this.getImage()
             console.error(e)
           }).finally(() => {
             this.loading = false

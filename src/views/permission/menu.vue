@@ -42,9 +42,9 @@
 
       </template>
 
-      <template slot="operation" slot-scope="scope">
-        <el-button @click="opDialog('edit',scope.scope)"> 编辑</el-button>
-        <el-button @click="deleteData(scope.scope)" type="danger"> 删除</el-button>
+      <template slot="operation" slot-scope="{ scope }">
+        <el-button @click="opDialog('edit',scope)"> 编辑</el-button>
+        <el-button @click="deleteData(scope)" type="danger"> 删除</el-button>
       </template>
     </el-table-custom>
     <!-- E 表格 -->
@@ -88,6 +88,7 @@
                 :key="item.name"
                 :label="item.title"
                 :value="item.title +','+ item.name"
+                :disabled="opFormModelLocal.id === item.id"
               >
               </el-option>
             </el-select>
@@ -213,7 +214,7 @@ export default {
         { label: '菜单name', prop: 'name' },
         { label: '按钮', prop: 'menubuttonList', isSlot: true },
         { label: '菜单排序', prop: 'menuOrder' },
-        { label: '操作', isSlot: true, prop: 'operation', fixed: 'right', dataIndex: '', align: 'center' }
+        { label: '操作', isSlot: true, prop: 'operation', fixed: 'right', dataIndex: '', align: 'center', width:150 }
       ]
     }
   },

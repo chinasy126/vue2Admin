@@ -65,3 +65,11 @@ export function updatePassword(data) {
     data
   })
 }
+
+export function setUserAvator(data) {
+  return request({
+    url: '/user/setavator',
+    method: 'post',
+    data
+  })
+}

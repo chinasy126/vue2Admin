@@ -7,29 +7,6 @@ Vue.use(Router)
 import Layout from '@/layout'
 
 /**
- * Note: sub-menu only appear when route children.length >= 1
- * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
- *
- * hidden: true                   if set true, item will not show in the sidebar(default is false)
- * alwaysShow: true               if set true, will always show the root menu
- *                                if not set alwaysShow, when item has more than one children route,
- *                                it will becomes nested mode, otherwise not show the root menu
- * redirect: noRedirect           if set noRedirect will no redirect in the breadcrumb
- * name:'router-name'             the name is used by <keep-alive> (must set!!!)
- * meta : {
-    roles: ['admin','editor']    control the page roles (you can set multiple roles)
-    title: 'title'               the name show in sidebar and breadcrumb (recommend set)
-    icon: 'svg-name'/'el-icon-x' the icon show in the sidebar
-    breadcrumb: false            if set false, the item will hidden in breadcrumb(default is true)
-    activeMenu: '/example/list'  if set path, the sidebar will highlight the path you set
-  }
- */
-
-/**
- * constantRoutes
- * a base page that does not have permission requirements
- * all roles can be accessed
- *
  * 静态常用路由
  */
 export const constantRoutes = [
@@ -70,7 +47,7 @@ export const configRoutes = [
     component: Layout,
     name: 'permissions',
     alwaysShow: true, // 当有一个子菜单显示
-    meta: { title: '系统管理', icon: 'el-icon-s-help', 'menuOrder': 0 },
+    meta: { title: '系统管理', icon: 'el-icon-s-tools', 'menuOrder': 1 },
     children: [
       {
         path: 'menu',
@@ -94,7 +71,7 @@ export const configRoutes = [
         name: 'role',
         component: () => import('@/views/permission/role'),
         meta: {
-          title: '角色管理', icon: 'form', 'menuOrder': 0,
+          title: '角色管理', icon: 'el-icon-message-solid', 'menuOrder': 0,
           btnPermissions: [
             { title: '新增', type: 'add' },
             { title: '编辑', type: 'edit' },
@@ -107,7 +84,7 @@ export const configRoutes = [
         name: 'user',
         component: () => import('@/views/permission/user'),
         meta: {
-          title: '用户管理', icon: 'form',
+          title: '用户管理', icon: 'el-icon-user-solid',
           'menuOrder': 0,
           btnPermissions: [
             { title: '新增', type: 'add' },
@@ -124,14 +101,14 @@ export const configRoutes = [
     component: Layout,
     name: 'news',
     alwaysShow: true, // 当有一个子菜单显示
-    meta: { title: '新闻', icon: 'el-icon-s-help', 'menuOrder': 1 },
+    meta: { title: '新闻', icon: 'el-icon-s-order', 'menuOrder': 0 },
     children: [
       {
         path: 'newsindex',
         name: 'newsindex',
         component: () => import('@/views/news/newsIndex'),
         meta: {
-          title: '新闻组件', icon: 'form', 'menuOrder': 1,
+          title: '新闻组件', icon: 'el-icon-s-operation', 'menuOrder': 0,
           btnPermissions: [
             { title: '添加', type: 'add' },
             { title: '导入', type: 'import' },
@@ -149,14 +126,14 @@ export const configRoutes = [
     component: Layout,
     name: 'product',
     alwaysShow: true, // 当有一个子菜单显示
-    meta: { title: '产品', icon: 'el-icon-s-help', 'menuOrder': 1 },
+    meta: { title: '产品', icon: 'el-icon-s-grid', 'menuOrder': 0 },
     children: [
       {
         path: 'class',
         name: 'productclass',
         component: () => import('@/views/product/productClass'),
         meta: {
-          title: '产品分类', icon: 'form', 'menuOrder': 1,
+          title: '产品分类', icon: 'el-icon-menu', 'menuOrder': 0,
           btnPermissions: [
             { title: '添加', type: 'add' },
             { title: '编辑', type: 'edit' },
@@ -169,7 +146,7 @@ export const configRoutes = [
         name: 'productindex',
         component: () => import('@/views/product/produtIndex'),
         meta: {
-          title: '产品管理', icon: 'form', 'menuOrder': 3,
+          title: '产品管理', icon: 'form', 'menuOrder': 0,
           btnPermissions: [
             { title: '添加', type: 'add' },
             { title: '编辑', type: 'edit' },
