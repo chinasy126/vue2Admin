@@ -7,7 +7,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { getList } from '@/api/table1'
+
 import UpdatePassword from '@/views/user/updatePassword'
 
 export default {
@@ -30,9 +30,7 @@ export default {
     },
 
     getMockJsData() {
-      getList().then(response => {
-        console.log(response)
-      })
+
     }
   },
   computed: {
