@@ -8,14 +8,14 @@
 
     >
       <template slot="operationButton">
-        <el-button @click="opearDialog('add','')" v-permission="['add']" > 新增</el-button>
-        <el-button @click="batchDelete" type="danger" v-permission="['batchDelete']" > 批量删除</el-button>
+        <el-button @click="opearDialog('add','')" v-permission="['add']"> 新增</el-button>
+        <el-button @click="batchDelete" type="danger" v-permission="['batchDelete']"> 批量删除</el-button>
       </template>
     </SearchPanel>
     <!-- E 搜索栏目 -->
 
     <!-- S 表格 -->
-    <el-table-custom
+    <TablePannel
       :rowKey="(record) => record.id"
       :columns="columns"
       :data-source="dataSource"
@@ -29,10 +29,11 @@
       :table-loading="searchBtnLoading"
     >
       <template slot="operation" slot-scope="{ scope }">
-        <el-button @click="opearDialog('edit',scope)" v-permission="['edit']" > 编辑</el-button>
-        <el-button @click="deleteData(scope)" type="danger" v-permission="['delete']" > 删除</el-button>
+        <el-button @click="opearDialog('edit',scope)" v-permission="['edit']"> 编辑</el-button>
+        <el-button @click="opearDialog('editPassword',scope)" v-permission="['edit']"> 修改密码</el-button>
+        <el-button @click="deleteData(scope)" type="danger" v-permission="['delete']"> 删除</el-button>
       </template>
-    </el-table-custom>
+    </TablePannel>
     <!-- E 表格 -->
 
     <!--  S 分页  -->
@@ -85,7 +86,7 @@ import comActionMixin from '@/mixins/comActionMixin'
 
 export default {
   name: 'user',
-  components: { Page,OpFormPannel, CommonAction, SearchPanel},
+  components: { Page, OpFormPannel, CommonAction, SearchPanel },
   mixins: [queryListmixin, opFormMixins, comActionMixin],
   filters: {},
   data() {
@@ -93,13 +94,7 @@ export default {
       opFormMdifyData: {},// 修改数据
       opRoleList: [], // 角色列表
       // 表单验证
-      opFormRules: {
-        username: [{ required: true, message: '用户名必填', trigger: 'blur' }
-        ],
-        roleId: [
-          { required: true, message: '请选择用户角色', trigger: 'change' }
-        ]
-      },
+      opFormRules: {},
       opFormItems: [],
       getListFnName: dataListByPage, // 主页面查询
       searchPannelList: [
@@ -112,7 +107,7 @@ export default {
         { label: '出生年月', prop: 'birthday' },
         { label: '用户角色', prop: 'roleName' },
         { label: '添加时间', prop: 'createTime' },
-        { label: '操作', isSlot: true, prop: 'operation', fixed: 'right', dataIndex: '', align: 'center' }
+        { label: '操作', isSlot: true, prop: 'operation', fixed: 'right', dataIndex: '', align: 'center', width: '240' }
       ]
     }
   },
@@ -122,12 +117,7 @@ export default {
   methods: {
     async onInit() {
       await this.getRoleList()
-      this.opFormItems = [
-        { label: '所属角色', prop: 'roleId', type: 'select', selectValue: this.opRoleList },
-        { label: '用户名', prop: 'username', type: 'input' },
-        { label: '用户密码', prop: 'password', type: 'input', showValue: false },
-        { label: '出生年月', prop: 'birthday', type: 'date', value: parseTime(new Date(), '{y}-{m}-{d}') }
-      ]
+      this.opFormItems = []
     },
     /**
      *  下拉框角色列表，弹框中使用
@@ -159,8 +149,25 @@ export default {
      */
     opearDialog(opera, param) {
       this.opFormDialog.visible = true
-      const opFormItems = JSON.parse(JSON.stringify(this.opFormItems))
+      const opFormItems = JSON.parse(JSON.stringify([
+        { label: '所属角色', prop: 'roleId', type: 'select', selectValue: this.opRoleList },
+        { label: '用户名', prop: 'username', type: 'input' },
+        { label: '用户密码', prop: 'password', type: 'password', showValue: false },
+        { label: '出生年月', prop: 'birthday', type: 'date', value: parseTime(new Date(), '{y}-{m}-{d}') }
+      ]))
+
+      const opFormRules = {
+        username: [{ required: true, message: '用户名必填', trigger: 'blur' }
+        ],
+        roleId: [
+          { required: true, message: '请选择用户角色', trigger: 'change' }
+        ],
+        password: [{ required: true, message: '密码必填', trigger: 'blur' }
+        ]
+      }
+
       if (opera === 'add') {
+        this.opFormRules = opFormRules
         this.opFormItems = opFormItems.map(item => {
           item.value = ''
           item.disabled = false
@@ -170,8 +177,26 @@ export default {
         this.opFormDialog.buttonTitle = '新增'
         this.opFnName = dataInsert
       } else if (opera === 'edit') {
-
-        this.opFormItems = opFormItems.map(item => {
+        delete opFormRules.password
+        this.opFormRules = opFormRules
+        this.opFormItems = opFormItems.filter((item) => {
+          return item.prop !== 'password'
+        }).map(item => {
+          if (item.prop === 'username') {
+            item.disabled = true
+          }
+          item.value = param[item.prop]
+          return item
+        })
+        this.opFormMdifyData.id = param.id
+        this.opFnName = dataModify
+        this.opFormDialog.title = '修改'
+        this.opFormDialog.buttonTitle = '修改'
+      } else if (opera === 'editPassword') {
+        this.opFormRules = { password: opFormRules.password }
+        this.opFormItems = opFormItems.filter((item) => {
+          return item.prop === 'username' || item.prop === 'password'
+        }).map(item => {
           if (item.prop === 'username') {
             item.disabled = true
           }

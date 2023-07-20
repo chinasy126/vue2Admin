@@ -107,6 +107,7 @@ export default {
 
 <style scoped>
 .el-form {
-  margin: 50px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 </style>

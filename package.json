@@ -16,8 +16,10 @@
   "dependencies": {
     "axios": "0.18.1",
     "core-js": "3.6.5",
+    "crypto-js": "^4.1.1",
     "element-ui": "2.13.2",
     "js-cookie": "2.2.0",
+    "js-pinyin": "^0.2.4",
     "lodash": "^4.17.21",
     "normalize.css": "7.0.0",
     "nprogress": "0.2.0",
@@ -29,6 +31,7 @@
     "vue-awesome": "^4.5.0",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "3.0.6",
+    "vuedraggable": "^2.24.3",
     "vuex": "3.1.0"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="imageUpload">
     <!-- S 上传按钮 -->
     <el-upload
       v-bind="[$attrs,$props]"
@@ -10,7 +10,7 @@
       :http-request="httpRequest"
     >
       <el-button size="mini" type="primary">{{buttonName}}</el-button>
-      <!--        <div class="div-plus"><i class="el-icon-plus avatar-uploader-icon"> </i></div>-->
+      <!--        <div cis-successlass="div-plus"><i class="el-icon-plus avatar-uploader-icon"> </i></div>-->
     </el-upload>
     <!-- E 上传按钮 -->
 
@@ -284,4 +284,9 @@ export default {
   height: 120px;
   display: block;
 }
+
+.imageUpload{
+  margin: 0px 20px 0px 20px !important;
+}
+
 </style>

@@ -17,11 +17,11 @@
             </el-dropdown-item>
           </router-link>
 
-          <el-dropdown-item @click.native="updateUserInfo('avatar')">
+          <el-dropdown-item @click.native="updateUserInfo('avatar','修改头像')">
             <span style="display:block;">修改头像</span>
           </el-dropdown-item>
 
-          <el-dropdown-item @click.native="updateUserInfo('password')">
+          <el-dropdown-item @click.native="updateUserInfo('password','修改密码')">
             <span style="display:block;">修改密码</span>
           </el-dropdown-item>
 
@@ -31,20 +31,25 @@
         </el-dropdown-menu>
       </el-dropdown>
 
-      <el-drawer
-        :visible.sync="drawerVisbile"
-        :with-header="false"
-      >
-        <update-password v-show="drawerType === 'password'"></update-password>
-        <ImageUpload v-if="drawerType === 'avatar'" ref="fileUpload"
-                     upload-folder-name="avatar"
-                     uploadDisplayType="other"
-                     buttonName="上传头像"
-                     @uploadSuccess="uploadSuccess" style="margin: 50px;"
-        />
+      <div class="mainDrawer">
+        <el-drawer
+          :visible.sync="drawerVisbile"
+          :with-header="true"
+          :title="drawerTitle"
+          :before-close="()=>{
+          drawerVisbile = false
+        }"
+        >
+          <update-password v-show="drawerType === 'password'"></update-password>
+          <ImageUpload v-if="drawerType === 'avatar'" ref="fileUpload"
+                       upload-folder-name="avatar"
+                       uploadDisplayType="other"
+                       buttonName="上传头像"
+                       @uploadSuccess="uploadSuccess" style="margin: 50px;"
+          />
 
-      </el-drawer>
-
+        </el-drawer>
+      </div>
     </div>
   </div>
 </template>
@@ -79,6 +84,7 @@ export default {
   },
   data() {
     return {
+      drawerTitle: '标题',
       drawerVisbile: false,
       drawerType: ''
     }
@@ -94,7 +100,8 @@ export default {
         this.$store.dispatch('user/getInfo')
       }
     },
-    updateUserInfo(type) {
+    updateUserInfo(type, name) {
+      this.drawerTitle = name
       this.drawerType = type
       this.drawerVisbile = true
     },
@@ -186,5 +193,9 @@ export default {
       }
     }
   }
+}
+
+.mainDrawer ::v-deep .el-drawer__header{
+  margin-bottom: 0px;
 }
 </style>

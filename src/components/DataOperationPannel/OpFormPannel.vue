@@ -7,12 +7,17 @@
   >
     <!--  model	表单数据对象  -->
     <el-form ref="opFormModel" :model="opFormModel" :rules="opFormRules" :label-width="labelWidth">
-      <template v-for="(item,index) in opFormItems" >
-        <slot :name="index" ></slot>
-        <el-form-item :label="item.label" :prop="item.prop" :key="index" >
+      <template v-for="(item,index) in opFormItems">
+        <slot :name="index"></slot>
+        <el-form-item :label="item.label" :prop="item.prop" :key="index">
           <template v-if="item.type === 'input'">
             <el-input v-model="opFormModel[item.prop]" :disabled="item.disabled" clearable/>
           </template>
+
+          <template v-if="item.type === 'password'">
+            <el-input v-model="opFormModel[item.prop]" :disabled="item.disabled" clearable show-password/>
+          </template>
+
           <template v-if="item.type === 'textarea'">
             <el-input v-model="opFormModel[item.prop]" type="textarea" clearable/>
           </template>
@@ -23,7 +28,9 @@
             <el-input-number v-model="opFormModel[item.prop]"></el-input-number>
           </template>
           <template v-if="item.type === 'select'">
-            <el-select v-model="opFormModel[item.prop]" placeholder="请选择" filterable clearable>
+            <el-select v-model="opFormModel[item.prop]" placeholder="请选择" filterable clearable
+                       @change="(val)=> onChangeSelect(val,item,opFormModel)"
+            >
               <el-option v-for="slectItem in item.selectValue"
                          :key="slectItem.value"
                          :label="slectItem.label"
@@ -114,9 +121,18 @@ export default {
 
   },
   methods: {
+    /**
+     *
+     * 封装组件的下拉框事件
+     * 选择值
+     *
+     */
+    onChangeSelect(value, type, opForm) {
+      this.$emit('onChangeSelect', value, type, opForm)
+
+    },
 
     checkForm(rule, value, callback) {
-      console.log(value)
       if (value == 1) {
         callback()
       } else {

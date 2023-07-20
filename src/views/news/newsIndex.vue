@@ -19,7 +19,7 @@
     <!-- E 搜索栏目 -->
 
     <!-- S 表格 -->
-    <el-table-custom
+    <TablePannel
       :rowKey="(record) => record.id"
       :columns="columns"
       :dataSource="dataSource"
@@ -39,7 +39,7 @@
         <el-button size="mini" @click="opDialog('edit',scope.scope)" v-permission="['edit']"> 编辑</el-button>
         <el-button size="mini" @click="opDelDialog(scope.scope)" type="danger" v-permission="['delete']"> 删除</el-button>
       </template>
-    </el-table-custom>
+    </TablePannel>
     <!-- E 表格 -->
 
     <!--  S 分页  -->
@@ -80,6 +80,9 @@
                        @uploadSuccess="uploadSuccess"
           />
         </el-form-item>
+        <el-form-item label="内容">
+          <QuillEditor :value="opFormModelLocal.contents" @changeQuillEditor="changeQuillEditor"  ></QuillEditor>
+        </el-form-item>
       </template>
     </OpFormPannel>
     <!-- E 新增修改 -->
@@ -87,6 +90,7 @@
 </template>
 
 <script>
+import QuillEditor from '@/components/QuillEditor/index'
 import Page from '@/components/Page/index'
 import { batchDelete, dataListByPage, exportExcelData, importExcelData, newsDelete, saveOrUpdate } from '@/api/news'
 import SearchPanel from '@/components/SearchPanel/SearchPanel'
@@ -100,9 +104,11 @@ import comActionMixin from '@/mixins/comActionMixin'
 import ImageUpload from '@/components/UploadFile/ImageUpload'
 import FileUpload from '@/components/UploadFile/FileUpload'
 import OpFormPannel from '@/components/DataOperationPannel/OpFormPannel'
+import pinyin from 'js-pinyin'
+// console.log( pinyin.getFullChars(''));
 
 export default {
-  components: { Page, OpFormPannel, FileUpload, ImageUpload, CommonAction, SearchPanel },
+  components: { Page, OpFormPannel, FileUpload, ImageUpload, CommonAction, SearchPanel , QuillEditor},
   mixins: [queryListmixin, opFormMixin, comActionMixin],
   filters: {},
   data() {
@@ -168,6 +174,15 @@ export default {
   created() {
   },
   methods: {
+    /**
+     *
+     * 富文本编辑器
+     *
+     */
+    changeQuillEditor(val){
+      this.opFormModelLocal.contents = val
+    },
+
     /**
      *  导出数据
      */

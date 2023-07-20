@@ -46,9 +46,9 @@ Vue.use(ElementUI, {
   size: 'mini' // set element-ui default size
 })
 
-import elTableCustom from '@/components/TablePannel/elTableCustom'
+import elTableCustom from '@/components/TablePannel/TablePannel'
 
-Vue.component('el-table-custom', elTableCustom)
+Vue.component('TablePannel', elTableCustom)
 
 Vue.config.productionTip = false
 

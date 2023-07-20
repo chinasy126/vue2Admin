@@ -26,7 +26,7 @@ const opFormMixin = {
      * @param params
      */
     async onOpFormSubmit(params) {
-      this.mergeOperationForm(params)
+      await this.mergeOperationForm(params)
       if (this.isLegal() === true) {
         return true
       }

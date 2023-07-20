@@ -13,7 +13,7 @@
     <!-- E 搜索栏目 -->
 
     <!-- S 表格 -->
-    <el-table-custom
+    <TablePannel
       :rowKey="(record) => record.id"
       :columns="columns"
       :data-source="dataSource"
@@ -33,7 +33,7 @@
         <el-button @click="opDialog('edit',scope.scope)"> 编辑</el-button>
         <el-button @click="deleteData(scope.scope)" type="danger"> 删除</el-button>
       </template>
-    </el-table-custom>
+    </TablePannel>
     <!-- E 表格 -->
 
     <!--  S 分页  -->
