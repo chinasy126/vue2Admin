@@ -84,6 +84,20 @@ import { roleList } from '@/api/permission/role'
 import opFormMixins from '@/mixins/opFormMixin'
 import comActionMixin from '@/mixins/comActionMixin'
 
+let checkCurrentBirthday = (rule, value, callback) => {
+  let regExp = /^(\d{4})-(\d{2})-(\d{2})$/
+  if (!regExp.test(value)) {
+    return callback(new Error('输入日期不正确'))
+  } else {
+    if (new Date(value).getTime() - new Date().getTime() > 0) {
+      return callback(new Error('输入的日期不能超过当前日期'))
+    } else {
+      callback()
+    }
+  }
+
+}
+
 export default {
   name: 'user',
   components: { Page, OpFormPannel, CommonAction, SearchPanel },
@@ -144,6 +158,7 @@ export default {
     mergeOperationForm(params) {
       Object.assign(params, this.opFormMdifyData)
     },
+
     /**
      *  打开对话框
      */
@@ -157,12 +172,16 @@ export default {
       ]))
 
       const opFormRules = {
-        username: [{ required: true, message: '用户名必填', trigger: 'blur' }
+        username: [
+          { required: true, message: '用户名必填', trigger: 'blur' }
         ],
         roleId: [
-          { required: true, message: '请选择用户角色', trigger: 'change' }
-        ],
+          { required: true, message: '请选择用户角色', trigger: 'change' }],
         password: [{ required: true, message: '密码必填', trigger: 'blur' }
+        ],
+        birthday: [
+          { required: true, message: '出生年月必填', trigger: 'blur' },
+          { validator: checkCurrentBirthday, trigger: 'blur' }
         ]
       }
 

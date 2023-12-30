@@ -116,13 +116,13 @@ export default {
           { required: true, trigger: 'change', message: '请选择所属分类' }
         ],
         name: [
-          { required: true, message: '请输入分类名称', trigger: 'blur' }
+          { required: true, message: '请输入产品名称', trigger: 'blur' }
         ]
       },
       opFormItems: [
         { prop: 'id', value: '' },
         { label: '所属分类', prop: 'pid', type: 'select', selectValue: [] },
-        { label: '分类名称', prop: 'name', type: 'input' },
+        { label: '产品名称', prop: 'name', type: 'input' },
         { label: '推荐值', prop: 'top', type: 'number' },
         { label: '访问量', prop: 'num', type: 'number' }
       ],

@@ -256,17 +256,22 @@ export default {
     async opDialog(opera, param) {
       const selectValue = await this.getSelectValue()
       this.opFormItems = [
+        { label: '', prop: 'id'},
         { label: '父级菜单', prop: 'parentMenu', type: 'select', selectValue: selectValue },
         { label: '菜单名称', prop: 'title', type: 'input' },
         { label: '菜单Name', prop: 'name', type: 'input' },
         { label: '菜单排序', prop: 'menuOrder', type: 'number', value: 0 }
       ]
+
+
+      typeof (param.id) !== 'undefined' ? this.opFormItems.push({ prop: 'id', value: param.id }) : ''
+      console.log(this.opFormItems)
+
       this.opFormRules = {}
       this.opFormRules = {
         title: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
         name: [{ required: true, message: '请输入菜单name', trigger: 'blur' }]
       }
-      console.log(this.opFormItems)
 
       this.opFormDialog = { title: '新增菜单', visible: true, buttonTitle: '新增菜单' }
       let _param = JSON.parse(JSON.stringify(param))
@@ -277,6 +282,13 @@ export default {
       if (opera === 'add') {
         this.opFormDialog.buttonTitle = '添加'
       } else if (opera === 'edit') {
+
+        param['parentMenu'] = param['fid']
+        this.opFormItems = this.opFormItems.map(res => {
+          res.value = param[res.prop]
+          return res
+        })
+
         this.opFormDialog.buttonTitle = '修改'
 
       }
@@ -299,7 +311,7 @@ export default {
         { label: '父级菜单', prop: 'firMenuId', type: 'select', selectValue: selectValue, value: '' },
         { label: '二级菜单', prop: 'menuId', type: 'select', selectValue: [], value: '' },
         { label: '按钮名称', prop: 'name', type: 'input', value: '' },
-        { label: '按钮名称', prop: 'type', type: 'input', value: '' }
+        { label: '按钮类别', prop: 'type', type: 'input', value: '' }
       ]
       this.opFormDialog = { title: '新增按钮', visible: true, buttonTitle: '新增按钮' }
       this.opFnName = indertBtn

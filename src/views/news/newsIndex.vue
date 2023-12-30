@@ -204,6 +204,7 @@ export default {
     opDialog(opera, param) {
       this.opFnName = saveOrUpdate
       this.uploadImgList = []
+      this.opFormModelLocal.contents = ''
       this.opFormItems = this.opFormItems.map(item => {
         item.value = typeof (param[item.prop]) !== 'undefined' || item.type === 'date' ?
           (opera === 'add' ? parseTime(new Date(), '{y}-{m}-{d}') : param[item.prop]) : ''
@@ -217,6 +218,7 @@ export default {
         this.opFormDialog.title = '修改'
         this.opFormDialog.buttonTitle = '修改'
         // 图片
+        this.opFormModelLocal.contents = param.contents
         this.opFormModelLocal.pic = param.pic
         if (param.pic !== '' && typeof (param.pic) !== 'object') {
           this.uploadImgList = [{ 'url': param.pic }]
