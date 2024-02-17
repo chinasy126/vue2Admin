@@ -9,7 +9,7 @@
       :show-file-list="false"
       :http-request="httpRequest"
     >
-      <el-button size="mini" type="primary">{{buttonName}}</el-button>
+      <el-button size="mini" type="primary">{{ buttonName }}</el-button>
       <!--        <div cis-successlass="div-plus"><i class="el-icon-plus avatar-uploader-icon"> </i></div>-->
     </el-upload>
     <!-- E 上传按钮 -->
@@ -71,7 +71,7 @@
   </div>
 </template>
 <script>
-import { uploadImg } from '@/api/uploadFile'
+import { uploadImg, getQiniuImageUrl } from '@/api/uploadFile'
 
 export default {
   name: 'ImageUpload',
@@ -157,9 +157,18 @@ export default {
     /**
      *  打开图片对话框
      */
-    showImgDialog(item) {
-      this.dialogImg = item.url
-      this.uploadDialog.visible = true
+    async showImgDialog(item) {
+      const _this = this
+      if(process.env.VUE_APP_UPLOAD_METHODS ==="qiniu"){
+        const url = await getQiniuImageUrl({ url: item.url })
+        _this.dialogImg = url.data.data
+      }else if(process.env.VUE_APP_UPLOAD_METHODS ==="local"){
+        this.dialogImg = item.url
+      }else if(process.env.VUE_APP_UPLOAD_METHODS ==="oss"){
+
+      }
+
+      _this.uploadDialog.visible = true
     },
 
     /**
@@ -285,7 +294,7 @@ export default {
   display: block;
 }
 
-.imageUpload{
+.imageUpload {
   margin: 0px 20px 0px 20px !important;
 }
 

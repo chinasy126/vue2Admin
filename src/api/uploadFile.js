@@ -22,4 +22,13 @@ const uploadImg = (data, config, callback) => {
   )
 }
 
-export { uploadImg }
+const getQiniuImageUrl=(data)=>{
+  return request({
+      url: `/upload/qiniuImageUrl`,
+      method: 'post',
+      data: data
+    }
+  )
+}
+
+export { uploadImg,getQiniuImageUrl}

@@ -68,3 +68,13 @@ export function category() {
     method: 'post'
   })
 }
+
+
+
+export function detail(data) {
+  return request({
+    url: `/${urlPrefix}/detail`,
+    method: 'post',
+    data
+  })
+}

@@ -341,6 +341,7 @@ export default {
      */
     deleteData(param) {
       this.comFnName = dataDelete
+      this.comActionDialog.buttonTitle = "删除"
       this.comActionCondition = { id: param.id }
       this.comActionDialog.visible = true
     },

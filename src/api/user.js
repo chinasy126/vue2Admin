@@ -22,6 +22,13 @@ export function logout() {
   })
 }
 
+export function refreshToken() {
+  return request({
+    url: `/user/resetToken`,
+    method: 'POST'
+  })
+}
+
 /**
  * 通过角色获取菜单
  * @returns {AxiosPromise}

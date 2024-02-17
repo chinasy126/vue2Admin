@@ -157,7 +157,7 @@ export default {
       opFormRules: {
         title: [
           { required: true, trigger: 'blur', validator: titleFn },
-          { min: 5, max: 100, message: '长度在 5 到 100 个字符', trigger: 'blur' }
+          // { min: 5, max: 100, message: '长度在 5 到 100 个字符', trigger: 'blur' }
         ],
         update: [
           { required: true, message: '请输入日期', trigger: 'blur' }

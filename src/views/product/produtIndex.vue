@@ -86,7 +86,7 @@
 
 <script>
 
-import { dataDelete, dataListByPage, saveOrUpdate } from '@/api/product/product'
+import { dataDelete, dataListByPage, saveOrUpdate , detail } from '@/api/product/product'
 import { category } from '@/api/product/productClass'
 import SearchPanel from '@/components/SearchPanel/SearchPanel'
 import queryListmixin from '@/mixins/queryListMixin'
@@ -124,6 +124,7 @@ export default {
         { label: '所属分类', prop: 'pid', type: 'select', selectValue: [] },
         { label: '产品名称', prop: 'name', type: 'input' },
         { label: '推荐值', prop: 'top', type: 'number' },
+        { label: '日期', prop: 'update', type: 'date' },
         { label: '访问量', prop: 'num', type: 'number' }
       ],
       getListFnName: dataListByPage, // 主页面查询
@@ -181,9 +182,10 @@ export default {
     /**
      *  打开对话框
      */
-    opearDialog(opera, param) {
+    async opearDialog(opera, param) {
       this.opFnName = saveOrUpdate
       this.uploadImgList = []
+
       this.opFormItems = this.opFormItems.map(item => {
         item.value = typeof (param[item.prop]) !== 'undefined' || item.type === 'date' ?
           (opera === 'add' ? parseTime(new Date(), '{y}-{m}-{d}') : param[item.prop]) : ''
@@ -194,6 +196,8 @@ export default {
         this.opFormDialog.title = '新增'
         this.opFormDialog.buttonTitle = '新增'
       } else if (opera === 'edit') {
+        const result =  await detail({id:param.id})
+        param = result.data.data
         this.opFormDialog.title = '修改'
         this.opFormDialog.buttonTitle = '修改'
         // 图片

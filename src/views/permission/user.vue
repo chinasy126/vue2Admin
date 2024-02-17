@@ -192,6 +192,8 @@ export default {
           item.disabled = false
           return item
         })
+        this.opFormMdifyData.id = ''
+        console.log(this.opFormItems)
         this.opFormDialog.title = '新增'
         this.opFormDialog.buttonTitle = '新增'
         this.opFnName = dataInsert

@@ -119,6 +119,8 @@ export default {
       form.append('file', fileObj)
       form.append('type', '') // 文件类型拆分文件夹
 
+      form.append('fullpath', process.env.VUE_APP_UPLOAD_FULL_PATH)
+
       uploadImg(form, {
         // 因为我们上传了图片,因此需要单独执行请求头的Content-Type
         headers: {
